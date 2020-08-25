@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+    <title>Socket.IO chat</title>
+</head>
+<body>
+
+    <ul id="RoomList">
+        <li>
+            <a href="/channel1">Channel 1</a>
+        </li>
+    </ul>
+    <form method="post" action="/create_channel" id="form">
+        <input type="text" name="channel_name" placeholder="Créer un channel" id="channel_name">
+        <input type="submit" value="Créer" name="submit" id="submit">
+    </form>
+    <div id="error"></div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        $(function () {
+            let socket = io();
+
+            $('#submit').click(function () {
+                if ($('#channel_name').val() === '') {
+                    $('#error').text('Il faut donner un nom à votre channel')
+                    return false;
+                } else {
+                    let socket = io.connect();
+                    socket.emit('create', $('#channel_name').val());
+                }
+            })
+
+            socket.on('room', function (data) {
+                for (let i = 0; i < data.room.length; i++) {
+                    $('#RoomList').append('<li><a href="/room/' + data.room[i] + '">' + data.room[i] + '</a></li>')
+                }
+            });
+        });
+    </script>
+</body>
+</html>
